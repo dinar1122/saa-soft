@@ -28,16 +28,15 @@ const props = defineProps({
 const loginError = ref('')
 const passwordError = ref('')
 
-const accountLabel = ref(
-  
-    props.account.label
-      .reduce((acc: string, item: { text: string }) => acc + (item.text + ';'), '')
-      .slice(0, -1),
+const accountLabel = computed(() =>
+  props.account.label
+    .reduce((acc: string, item: { text: string }) => acc + (item.text + ';'), '')
+    .slice(0, -1)
 )
 
-const accountType = ref(props.account.type)
-const accountLogin = ref(props.account.login)
-const accountPassword = ref(props.account.password)
+const accountType = computed(() => props.account.type)
+const accountLogin = computed(() => props.account.login)
+const accountPassword = computed(() => props.account.password)
 
 const validateLogin = (value: string) => {
   if (!value.trim()) {
