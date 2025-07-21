@@ -50,7 +50,6 @@ export const useAccountsStore = defineStore('accounts', () => {
   }
 
   const updateAccount = (id: string, updates: Partial<Account>) => {
-    console.log(updates)
     const index = accounts.value.findIndex(a => a.id === id)
     if (index !== -1) {
       accounts.value[index] = {

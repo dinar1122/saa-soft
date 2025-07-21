@@ -28,15 +28,28 @@ const props = defineProps({
 const loginError = ref('')
 const passwordError = ref('')
 
-const accountLabel = computed(() =>
-  props.account.label
-    .reduce((acc: string, item: { text: string }) => acc + (item.text + ';'), '')
-    .slice(0, -1)
-)
+const accountLabel = computed({
+  get: () => props.account.label.map((item: { text: string }) => item.text).join(';'),
+  set: (value: string) => {
+    const labelArray = value.split(';').map(text => ({ text }))
+    handleFieldUpdate('label', labelArray)
+  },
+})
 
-const accountType = computed(() => props.account.type)
-const accountLogin = computed(() => props.account.login)
-const accountPassword = computed(() => props.account.password)
+
+const accountType = computed({
+  get: () => props.account.type,
+  set: (val: string) => handleFieldUpdate('type', val),
+})
+const accountLogin = computed({
+  get: () => props.account.login,
+  set: (val: string) => handleFieldUpdate('login', val),
+})
+
+const accountPassword = computed({
+  get: () => props.account.password,
+  set: (val: string) => handleFieldUpdate('password', val),
+})
 
 const validateLogin = (value: string) => {
   if (!value.trim()) {
@@ -52,26 +65,37 @@ const validatePassword = (value: string) => {
   if (accountType.value === 'local' && !value.trim()) {
     return 'Пароль обязателен для заполнения'
   }
-  if (value.length > 50) {
+  if (value.length > 100) {
     return 'Пароль не должен превышать 100 символов'
   }
   
   return ''
 }
 
-const handleFieldUpdate = (field: string, value: string) => {
+const handleFieldUpdate = (field: string, value: string | { text: string }[]) => {
   if (field === 'login') {
-    loginError.value = validateLogin(value)
-    if (loginError.value) return
+    if (typeof value === 'string') {
+      loginError.value = validateLogin(value)
+      if (loginError.value) return
+    } else {
+      loginError.value = 'Неверный тип данных для логина'
+      return
+    }
   }
-  
+
   if (field === 'password') {
-    passwordError.value = validatePassword(value)
-    if (passwordError.value) return
+    if (typeof value === 'string') {
+      passwordError.value = validatePassword(value)
+      if (passwordError.value) return
+    } else {
+      passwordError.value = 'Неверный тип данных для пароля'
+      return
+    }
   }
-  
+
   props.updateAccountMethod(props.account.id, { [field]: value })
 }
+
 </script>
 
 <template>
